@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
-const urlDatabase = {
+let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
@@ -53,7 +53,9 @@ app.get("/hello", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  res.send("Ok");
+  const newKey = generateRandomString();
+  urlDatabase[newKey] = req.body["longURL"];
+  res.redirect("/urls");
 });
 
 app.listen(PORT, () => {

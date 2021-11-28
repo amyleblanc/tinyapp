@@ -67,6 +67,17 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
+// DELETE
+
+app.post("/urls/:shortURL/delete",(req, res)=>{
+  const shortURL = req.params.shortURL;  
+  delete urlDatabase[shortURL];
+
+  res.redirect("/urls");
+});
+
+// 404
+
 app.use(function (req, res, next) {
   res.status(404).send("Sorry, that page does not exist.");
 });

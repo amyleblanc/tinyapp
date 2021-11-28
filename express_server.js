@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 
 function generateRandomString() {
   let randomString = '';
@@ -21,6 +21,7 @@ let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -49,6 +50,9 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = req.params.shortURL;
+  if (urlDatabase[longURL] === undefined) { // ask mentor to take a look at this
+    res.status(404).send("Sorry, that page does not exist.");
+  };
   res.redirect(urlDatabase[longURL]);
 });
 
@@ -61,6 +65,10 @@ app.post("/urls", (req, res) => {
   const newKey = generateRandomString();
   urlDatabase[newKey] = req.body["longURL"];
   res.redirect("/urls");
+});
+
+app.use(function (req, res, next) {
+  res.status(404).send("Sorry, that page does not exist.");
 });
 
 app.listen(PORT, () => {

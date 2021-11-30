@@ -2,13 +2,13 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 
-function generateRandomString() {
+let generateRandomString = () => {
   let randomString = '';
   let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
-  for (let i = 0; i < 6; i++ ) {
+  for (let i = 0; i < 6; i++) {
     randomString += characters.charAt(Math.floor(Math.random() * characters.length));
-   };
+  }
   return randomString;
 };
 
@@ -54,7 +54,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
 
-  const templateVars = { shortURL, longURL }
+  const templateVars = { shortURL, longURL };
   res.render("urls_show", templateVars);
 });
 
@@ -65,7 +65,7 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = req.params.shortURL;
   if (urlDatabase[longURL] === undefined) { // ask mentor to take a look at this
     res.status(404).send("Sorry, that page does not exist.");
-  };
+  }
   res.redirect(urlDatabase[longURL]);
 });
 
@@ -101,7 +101,7 @@ app.post("/urls/:shortURL",(req, res)=>{
 // DELETE
 
 app.post("/urls/:shortURL/delete",(req, res)=>{
-  const shortURL = req.params.shortURL;  
+  const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
 
   res.redirect("/urls");
@@ -110,7 +110,7 @@ app.post("/urls/:shortURL/delete",(req, res)=>{
 
 // 404 PAGE NOT FOUND
 
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   res.status(404).send("Sorry, that page does not exist.");
 });
 

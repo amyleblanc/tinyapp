@@ -108,6 +108,14 @@ app.post("/login", (req, res) => {
 });
 
 
+// LOGOUT & DELETE COOKIE
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/urls");
+});
+
+
 // DELETE
 
 app.post("/urls/:shortURL/delete",(req, res)=> {

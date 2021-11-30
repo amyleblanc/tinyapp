@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080;
+const cookieParser = require("cookie-parser");
 
 let generateRandomString = () => {
   let randomString = '';
@@ -14,6 +15,7 @@ let generateRandomString = () => {
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
@@ -36,7 +38,7 @@ app.get("/", (req, res) => {
 // SHOW ALL SHORTENED URLS IN DATABASE
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
 });
 
@@ -89,7 +91,7 @@ app.post("/urls", (req, res) => {
 
 // EDIT
 
-app.post("/urls/:shortURL",(req, res)=>{
+app.post("/urls/:shortURL",(req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
@@ -98,9 +100,17 @@ app.post("/urls/:shortURL",(req, res)=>{
 });
 
 
+// LOGIN COOKIE
+
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username); //When we write cookie, there are two values we give, 1. Cookie name 2. Value for that cookie
+  res.redirect("/urls");
+});
+
+
 // DELETE
 
-app.post("/urls/:shortURL/delete",(req, res)=>{
+app.post("/urls/:shortURL/delete",(req, res)=> {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
 

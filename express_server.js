@@ -104,8 +104,9 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/register", (req, res) => {
   const newID = generateRandomString();
   users[newID] = { id: newID, email: req.body.email, password: req.body.password };
-  console.log(req.body);
-  console.log(users);
+  
+  res.cookie("username", req.body.email);
+  res.redirect("/urls");
 });
 
 // CREATE NEW URL
@@ -114,6 +115,7 @@ app.post("/urls", (req, res) => {
   console.log(req.body);
   const newKey = generateRandomString();
   urlDatabase[newKey] = req.body.longURL;
+
   res.redirect("/urls");
 });
 
@@ -132,7 +134,7 @@ app.post("/urls/:shortURL",(req, res) => {
 // LOGIN COOKIE
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username); //When we write cookie, there are two values we give, 1. Cookie name 2. Value for that cookie
+  res.cookie("username", req.body.username);
   res.redirect("/urls");
 });
 

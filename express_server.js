@@ -104,8 +104,8 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/register", (req, res) => {
   const newID = generateRandomString();
   users[newID] = { id: newID, email: req.body.email, password: req.body.password };
-  
-  res.cookie("username", req.body.email);
+
+  res.cookie("user_id", newID);
   res.redirect("/urls");
 });
 

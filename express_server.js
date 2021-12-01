@@ -62,6 +62,14 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 
+// REGISTRATION PAGE
+
+app.get("/register", (req, res) => {
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  res.render("registration", templateVars);
+})
+
+
 // INVALID SHORT URL => SEND 404
 
 app.get("/u/:shortURL", (req, res) => {

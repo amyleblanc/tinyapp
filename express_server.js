@@ -100,6 +100,13 @@ app.get("/u/:shortURL", (req, res) => {
 //   res.send("<html><body>Hello <b>World</b></body></html>\n");
 // });
 
+// REGISTER
+app.post("/register", (req, res) => {
+  const newID = generateRandomString();
+  users[newID] = { id: newID, email: req.body.email, password: req.body.password };
+  console.log(req.body);
+  console.log(users);
+});
 
 // CREATE NEW URL
 

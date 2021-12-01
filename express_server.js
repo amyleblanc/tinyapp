@@ -46,7 +46,8 @@ app.get("/urls", (req, res) => {
 // NEW SHORT URL LANDING PAGE
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  res.render("urls_new", templateVars);
 });
 
 

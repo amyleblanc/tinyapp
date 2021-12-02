@@ -19,6 +19,14 @@ const generateRandomString = () => {
   return randomString;
 };
 
+const checkEmail = (email) => {
+  let usersArray = Object.values(users);
+  if (usersArray.includes(email)) {
+    res.status(400).send("Sorry, this email has already been registered.");
+  }
+  return false;
+};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -79,7 +87,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/register", (req, res) => {
   const userID = req.cookies["user_id"];
   const templateVars = { urls: urlDatabase, user: users[userID] };
-    
+
   res.render("registration", templateVars);
 });
 
@@ -103,10 +111,14 @@ app.get("/u/:shortURL", (req, res) => {
 // REGISTER
 app.post("/register", (req, res) => {
   const newID = generateRandomString();
-  users[newID] = { id: newID, email: req.body.email, password: req.body.password };
-
-  res.cookie("user_id", newID);
-  res.redirect("/urls");
+  if (req.body.email === "" || req.body.password === "") {
+    res.status(400).send("Sorry, both email and password fields must be completed.");
+  }
+  if (!checkEmail(req.body.email)) {
+    users[newID] = { id: newID, email: req.body.email, password: req.body.password };
+    res.cookie("user_id", newID);
+    res.redirect("/urls");
+  }
 });
 
 

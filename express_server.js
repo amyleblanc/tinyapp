@@ -1,8 +1,8 @@
 const express = require("express");
-const app = express();
-const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const app = express();
+const PORT = 8080;
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -38,10 +38,10 @@ const users = {
 };
 
 // SERVER HOME PAGE
-
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
+
 
 // app.get("/urls.json", (req, res) => {
 //   res.json(urlDatabase);
@@ -49,45 +49,45 @@ app.get("/", (req, res) => {
 
 
 // SHOW ALL SHORTENED URLS IN DATABASE
-
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const userID = req.cookies["user_id"];
+  const templateVars = { urls: urlDatabase, user: users[userID] };
   res.render("urls_index", templateVars);
 });
 
 
 // NEW SHORT URL LANDING PAGE
-
 app.get("/urls/new", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const userID = req.cookies["user_id"];
+  const templateVars = { urls: urlDatabase, user: users[userID] };  
   res.render("urls_new", templateVars);
 });
 
 
 // SHOW SHORT URL PAGE
-
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
+  const userID = req.cookies["user_id"];
 
-  const templateVars = { shortURL, longURL };
+  const templateVars = { shortURL, longURL, user: users[userID] }; // does this need users object also?
   res.render("urls_show", templateVars);
 });
 
 
 // REGISTRATION PAGE
-
 app.get("/register", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const userID = req.cookies["user_id"];
+  const templateVars = { urls: urlDatabase, user: users[userID] };
+    
   res.render("registration", templateVars);
-})
+});
 
 
 // INVALID SHORT URL => SEND 404
-
 app.get("/u/:shortURL", (req, res) => {
   const longURL = req.params.shortURL;
-  if (urlDatabase[longURL] === undefined) { // ask mentor to take a look at this
+  if (urlDatabase[longURL] === undefined) {
     res.status(404).send("Sorry, that page does not exist.");
   }
   res.redirect(urlDatabase[longURL]);
@@ -95,10 +95,10 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 // // HELLO PAGE
-
 // app.get("/hello", (req, res) => {
 //   res.send("<html><body>Hello <b>World</b></body></html>\n");
 // });
+
 
 // REGISTER
 app.post("/register", (req, res) => {
@@ -109,10 +109,10 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-// CREATE NEW URL
 
+// CREATE NEW URL
 app.post("/urls", (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const newKey = generateRandomString();
   urlDatabase[newKey] = req.body.longURL;
 
@@ -121,7 +121,6 @@ app.post("/urls", (req, res) => {
 
 
 // EDIT
-
 app.post("/urls/:shortURL",(req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
@@ -132,15 +131,20 @@ app.post("/urls/:shortURL",(req, res) => {
 
 
 // LOGIN COOKIE
-
 app.post("/login", (req, res) => {
-  res.cookie("user_id", req.body.username);
+  // console.log(users[req.body.username]);
+  res.cookie("user_id", req.body.email);
   res.redirect("/urls");
 });
 
+// app.get("/login", (req, res) => {
+//   const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
+
+//   res.render("login", templateVars);
+// });
+
 
 // LOGOUT & DELETE COOKIE
-
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
@@ -148,7 +152,6 @@ app.post("/logout", (req, res) => {
 
 
 // DELETE
-
 app.post("/urls/:shortURL/delete",(req, res)=> {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
@@ -158,10 +161,10 @@ app.post("/urls/:shortURL/delete",(req, res)=> {
 
 
 // 404 PAGE NOT FOUND
-
-app.use(function(req, res, next) {
+app.use(function(req, res) {
   res.status(404).send("Sorry, that page does not exist.");
 });
+
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}!`);

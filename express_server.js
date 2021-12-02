@@ -134,7 +134,7 @@ app.post("/urls/:shortURL",(req, res) => {
 // LOGIN COOKIE
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
+  res.cookie("user_id", req.body.username);
   res.redirect("/urls");
 });
 
@@ -142,7 +142,7 @@ app.post("/login", (req, res) => {
 // LOGOUT & DELETE COOKIE
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 

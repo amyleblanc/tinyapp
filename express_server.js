@@ -19,10 +19,11 @@ const generateRandomString = () => {
   return randomString;
 };
 
-const checkEmail = (email) => {
-  let usersArray = Object.values(users);
-  if (usersArray.includes(email)) {
-    res.status(400).send("Sorry, this email has already been registered.");
+const checkEmail = (emailAddress) => {
+  for (const id in users) {
+    if (users[id].email === emailAddress) {
+      return true;
+    }
   }
   return false;
 };
@@ -67,7 +68,7 @@ app.get("/urls", (req, res) => {
 // NEW SHORT URL LANDING PAGE
 app.get("/urls/new", (req, res) => {
   const userID = req.cookies["user_id"];
-  const templateVars = { urls: urlDatabase, user: users[userID] };  
+  const templateVars = { urls: urlDatabase, user: users[userID] };
   res.render("urls_new", templateVars);
 });
 
@@ -114,10 +115,13 @@ app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send("Sorry, both email and password fields must be completed.");
   }
+  
   if (!checkEmail(req.body.email)) {
     users[newID] = { id: newID, email: req.body.email, password: req.body.password };
     res.cookie("user_id", newID);
     res.redirect("/urls");
+  } else {
+    res.status(400).send("Sorry, this email has already been registered.");
   }
 });
 

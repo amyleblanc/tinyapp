@@ -91,8 +91,8 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
   const userID = req.cookies["user_id"];
-
   const templateVars = { shortURL, longURL, user: users[userID] };
+
   res.render("urls_show", templateVars);
 });
 
@@ -108,12 +108,14 @@ app.get("/register", (req, res) => {
 
 // INVALID SHORT URL => SEND 404
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = req.params.shortURL;
-  if (urlDatabase[longURL] === undefined) {
+  const shortURL = req.params.shortURL;
+
+  if (!urlDatabase[shortURL]) {
     res.status(404).send("Sorry, that page does not exist.");
   }
-  res.redirect(urlDatabase[longURL]);
-});
+  res.redirect(urlDatabase[shortURL].longURL);
+}
+);
 
 
 // // HELLO PAGE
@@ -144,7 +146,7 @@ app.post("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
   const newKey = generateRandomString();
   urlDatabase[newKey] = { "longURL": req.body.longURL, "userID": userID };
-  console.log(urlDatabase);
+  
   res.redirect("/urls");
 });
 

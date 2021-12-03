@@ -37,17 +37,14 @@ const checkPassword = (password) => {
   return false;
 };
 
-const findUserURL = (obj, id) => {
-  for (const key in obj) {
-    if (obj[key].userID === id) {
-      let userURL = {};
-      let shortURL = obj[key];
-      let url = {"longURL": obj[key].longURL};
-      userURL[shortURL] = url;
-      return userURL;
+const findUserURL = (id) => {
+  let userURL = {};
+  for (const key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      userURL[key] = urlDatabase[key];
     }
   }
-  return false;
+  return userURL;
 };
 
 const urlDatabase = {
@@ -82,7 +79,7 @@ app.get("/", (req, res) => {
 // SHOW ALL SHORTENED URLS IN DATABASE
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
-  const userURLs = findUserURL(urlDatabase, userID);
+  const userURLs = findUserURL(userID);
   const templateVars = { urls: userURLs, user: users[userID] };
 
   if(!userID) {

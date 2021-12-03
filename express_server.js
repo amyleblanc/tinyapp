@@ -167,10 +167,10 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   if (!checkEmail(req.body.email)) {
-    res.status(400).send("Sorry, this email has not been registered.");
+    res.status(403).send("Sorry, this email has not been registered.");
   }
   if (!checkPassword(req.body.password)) {
-    res.status(400).send("Sorry, this password is incorrect.");
+    res.status(403).send("Sorry, this password is incorrect.");
   }
   
   const userID = checkEmail(req.body.email);

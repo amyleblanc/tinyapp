@@ -11,18 +11,12 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         
         <% if(user) { %> <!-- the Cookie is there-->
-          <span><h5>Logged In As: <%=user.email %>!</h5></span>
-          <form method="POST" action="/logout">
+            <form method="POST" action="/logout">
             <button class="btn btn-outline-dark">Logout</button>
             </form>
         <% } else { %> <!-- The cookie is not there-->
-          <form class="form-right" action="/login" method="POST">
-            <div class="form-group mb-2">
-              <input class="form-right" type="text" name="email" placeholder="Email"
-                style="width: 150px; margin: 1em">
-              <button type="submit" class="btn btn-outline-dark">Login</button>
-            </div>
-          </form>
+          <a class="nav-item nav-link" href="/login">Login</a>
+          <a class="nav-item nav-link" href="/register">Register</a>
         <% } %>
       </div>
     </div>

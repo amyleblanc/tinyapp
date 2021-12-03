@@ -71,6 +71,11 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
   const templateVars = { urls: urlDatabase, user: users[userID] };
+
+  if(!userID) {
+    res.send("Please log in to see your URLs or register to create an account!");
+  }
+
   res.render("urls_index", templateVars);
 });
 
@@ -146,7 +151,7 @@ app.post("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
   const newKey = generateRandomString();
   urlDatabase[newKey] = { "longURL": req.body.longURL, "userID": userID };
-  
+
   res.redirect("/urls");
 });
 
@@ -187,7 +192,7 @@ app.post("/login", (req, res) => {
 // LOGOUT & DELETE COOKIE
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 

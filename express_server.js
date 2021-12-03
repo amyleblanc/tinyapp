@@ -37,10 +37,22 @@ const checkPassword = (password) => {
   return false;
 };
 
+const findUserURL = (obj, id) => {
+  for (const key in obj) {
+    if (obj[key].userID === id) {
+      let userURL = {};
+      let shortURL = obj[key];
+      let url = {"longURL": obj[key].longURL};
+      userURL[shortURL] = url;
+      return userURL;
+    }
+  }
+  return false;
+};
 
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "" }
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "123" },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "321" }
 };
 
 const users = {
@@ -70,12 +82,12 @@ app.get("/", (req, res) => {
 // SHOW ALL SHORTENED URLS IN DATABASE
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
-  const templateVars = { urls: urlDatabase, user: users[userID] };
+  const userURLs = findUserURL(urlDatabase, userID);
+  const templateVars = { urls: userURLs, user: users[userID] };
 
   if(!userID) {
     res.send("Please log in to see your URLs or register to create an account!");
   }
-
   res.render("urls_index", templateVars);
 });
 
@@ -158,6 +170,7 @@ app.post("/urls", (req, res) => {
 
 // EDIT
 app.post("/urls/:shortURL",(req, res) => {
+  const userID = req.cookies["user_id"];
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;

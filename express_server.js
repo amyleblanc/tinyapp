@@ -22,7 +22,7 @@ const generateRandomString = () => {
 const checkEmail = (emailAddress) => {
   for (const id in users) {
     if (users[id].email === emailAddress) {
-      return users[id];
+      return users[id].id;
     }
   }
   return false;

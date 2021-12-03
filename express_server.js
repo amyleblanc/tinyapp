@@ -22,11 +22,21 @@ const generateRandomString = () => {
 const checkEmail = (emailAddress) => {
   for (const id in users) {
     if (users[id].email === emailAddress) {
+      return users[id];
+    }
+  }
+  return false;
+};
+
+const checkPassword = (password) => {
+  for (const id in users) {
+    if (users[id].password === password) {
       return true;
     }
   }
   return false;
 };
+
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -146,18 +156,27 @@ app.post("/urls/:shortURL",(req, res) => {
 });
 
 
-// LOGIN COOKIE
-app.post("/login", (req, res) => {
-  // console.log(users[req.body.username]);
-  res.cookie("user_id", req.body.email);
-  res.redirect("/urls");
+// LOGIN & SET COOKIE
+app.get("/login", (req, res) => {
+  const userID = req.cookies["user_id"];
+  const templateVars = { urls: urlDatabase, user: users[userID] };
+
+  res.render("login", templateVars);
 });
 
-// app.get("/login", (req, res) => {
-//   const templateVars = { urls: urlDatabase, users: req.cookies["user_id"] };
 
-//   res.render("login", templateVars);
-// });
+app.post("/login", (req, res) => {
+  if (!checkEmail(req.body.email)) {
+    res.status(400).send("Sorry, this email has not been registered.");
+  }
+  if (!checkPassword(req.body.password)) {
+    res.status(400).send("Sorry, this password is incorrect.");
+  }
+  
+  const userID = checkEmail(req.body.email);
+  res.cookie("user_id", userID);
+  res.redirect("/urls");
+});
 
 
 // LOGOUT & DELETE COOKIE

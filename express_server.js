@@ -39,8 +39,8 @@ const checkPassword = (password) => {
 
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "" },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "" }
 };
 
 const users = {
@@ -89,7 +89,7 @@ app.get("/urls/new", (req, res) => {
 // SHOW SHORT URL PAGE
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL].longURL;
   const userID = req.cookies["user_id"];
 
   const templateVars = { shortURL, longURL, user: users[userID] };
@@ -141,10 +141,10 @@ app.post("/register", (req, res) => {
 
 // CREATE NEW URL
 app.post("/urls", (req, res) => {
-  // console.log(req.body);
+  const userID = req.cookies["user_id"];
   const newKey = generateRandomString();
-  urlDatabase[newKey] = req.body.longURL;
-
+  urlDatabase[newKey] = { "longURL": req.body.longURL, "userID": userID };
+  console.log(urlDatabase);
   res.redirect("/urls");
 });
 

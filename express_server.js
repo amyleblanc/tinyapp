@@ -71,7 +71,7 @@ app.get("/", (req, res) => {
 });
 
 
-// app.get("/urls.json", (req, res) => {
+// app.get("/urls.json", (req, res) => {  // Do we still need this?
 //   res.json(urlDatabase);
 // });
 
@@ -103,7 +103,7 @@ app.get("/urls/new", (req, res) => {
 // SHOW SHORT URL PAGE
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
+  const longURL = urlDatabase[shortURL].longURL; // Getting error "cannot read property longURL of undefined".
   const userID = req.cookies["user_id"];
   const templateVars = { shortURL, longURL, user: users[userID] };
 
@@ -166,13 +166,17 @@ app.post("/urls", (req, res) => {
 
 
 // EDIT
-app.post("/urls/:shortURL",(req, res) => {
+app.post("/urls/:shortURL",(req, res) => { // ask mentor to verify this approach
   const userID = req.cookies["user_id"];
-  const shortURL = req.params.shortURL;
+  const shortURL = req.params.shortURL; // UNDEFINED
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-
-  res.redirect("/urls");
+  const allowedURLs = findUserURL(userID);
+  
+  if (Object.keys(allowedURLs).length === 0) {
+    res.status(403).send("Only the creator of this URL can edit.")
+  }
+  urlDatabase[shortURL] = { longURL, userID };  // shortURL displays as :shortURL
+  res.redirect("/urls");  
 });
 
 
@@ -207,11 +211,16 @@ app.post("/logout", (req, res) => {
 
 
 // DELETE
-app.post("/urls/:shortURL/delete",(req, res)=> {
+app.post("/urls/:shortURL/delete",(req, res)=> { // ask mentor to verify this approach
+  const userID = req.cookies["user_id"];
   const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
+  const userURLs = findUserURL(userID);
 
-  res.redirect("/urls");
+  if (userID === urlDatabase[shortURL].userID) {
+    delete urlDatabase[shortURL];
+    res.redirect("/urls");
+  }
+  res.status(403).send("Only the creator of this URL can delete it.")
 });
 
 

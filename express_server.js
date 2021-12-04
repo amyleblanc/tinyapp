@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8080;
 
@@ -28,14 +29,14 @@ const checkEmail = (emailAddress) => {
   return false;
 };
 
-const checkPassword = (password) => {
-  for (const id in users) {
-    if (users[id].password === password) {
-      return true;
-    }
-  }
-  return false;
-};
+// const checkPassword = (password) => {
+//   for (const id in users) {
+//     if (users[id].password === password) {
+//       return true;
+//     }
+//   }
+//   return false;
+// };
 
 const findUserURL = (id) => {
   let userURL = {};
@@ -141,12 +142,14 @@ app.get("/u/:shortURL", (req, res) => {
 // REGISTER
 app.post("/register", (req, res) => {
   const newID = generateRandomString();
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send("Sorry, both email and password fields must be completed.");
   }
   
-  if (!checkEmail(req.body.email)) {
-    users[newID] = { id: newID, email: req.body.email, password: req.body.password };
+  if (!checkEmail(req.body.email) {
+    users[newID] = { id: newID, email: req.body.email, password: hashedPassword };
     res.cookie("user_id", newID);
     res.redirect("/urls");
   } else {
@@ -193,7 +196,7 @@ app.post("/login", (req, res) => {
   if (!checkEmail(req.body.email)) {
     res.status(403).send("Sorry, this email has not been registered.");
   }
-  if (!checkPassword(req.body.password)) {
+  if (!bcrypt.compareSync(req.body.password, users[userID].password)) {
     res.status(403).send("Sorry, this password is incorrect.");
   }
   

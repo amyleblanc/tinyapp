@@ -1,12 +1,20 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+var cookieSession = require('cookie-session')
 const app = express();
 const PORT = 8080;
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+// app.use(cookieSession({
+//   name: 'session',
+//   keys: [/* secret keys */],
+
+//   // Cookie Options
+//   maxAge: 24 * 60 * 60 * 1000 // 24 hours
+// }));
 
 app.set("view engine", "ejs");
 

@@ -37,15 +37,6 @@ const checkEmail = (emailAddress) => {
   return false;
 };
 
-// const checkPassword = (password) => {
-//   for (const id in users) {
-//     if (users[id].password === password) {
-//       return true;
-//     }
-//   }
-//   return false;
-// };
-
 const findUserURL = (id) => {
   let userURL = {};
   for (const key in urlDatabase) {
@@ -80,11 +71,6 @@ app.get("/", (req, res) => {
 });
 
 
-// app.get("/urls.json", (req, res) => {  // Do we still need this?
-//   res.json(urlDatabase);
-// });
-
-
 // SHOW ALL SHORTENED URLS IN DATABASE
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
@@ -112,7 +98,7 @@ app.get("/urls/new", (req, res) => {
 // SHOW SHORT URL PAGE
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL; // Getting error "cannot read property longURL of undefined".
+  const longURL = urlDatabase[shortURL].longURL;
   const userID = req.cookies["user_id"];
   const templateVars = { shortURL, longURL, user: users[userID] };
 
@@ -141,18 +127,13 @@ app.get("/u/:shortURL", (req, res) => {
 );
 
 
-// // HELLO PAGE
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
-
-
 // REGISTER
 app.post("/register", (req, res) => {
   const newID = generateRandomString();
+  const isEmailPasswordEmpty = req.body.email === "" || req.body.password === "";
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
 
-  if (req.body.email === "" || req.body.password === "") {
+  if (isEmailPasswordEmpty) {
     res.status(400).send("Sorry, both email and password fields must be completed.");
   }
   
@@ -177,16 +158,17 @@ app.post("/urls", (req, res) => {
 
 
 // EDIT
-app.post("/urls/:shortURL",(req, res) => { // ask mentor to verify this approach
+app.post("/urls/:shortURL",(req, res) => {
   const userID = req.cookies["user_id"];
-  const shortURL = req.params.shortURL; // UNDEFINED
+  const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
   const allowedURLs = findUserURL(userID);
+  console.log(shortURL);
   
   if (Object.keys(allowedURLs).length === 0) {
     res.status(403).send("Only the creator of this URL can edit.");
   }
-  urlDatabase[shortURL] = { longURL, userID };  // shortURL displays as :shortURL
+  urlDatabase[shortURL] = { longURL, userID };
   res.redirect("/urls");
 });
 
@@ -201,6 +183,8 @@ app.get("/login", (req, res) => {
 
 
 app.post("/login", (req, res) => {
+  const userID = checkEmail(req.body.email);
+
   if (!checkEmail(req.body.email)) {
     res.status(403).send("Sorry, this email has not been registered.");
   }
@@ -208,7 +192,6 @@ app.post("/login", (req, res) => {
     res.status(403).send("Sorry, this password is incorrect.");
   }
   
-  const userID = checkEmail(req.body.email);
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
@@ -226,11 +209,15 @@ app.post("/urls/:shortURL/delete",(req, res)=> { // ask mentor to verify this ap
   const userID = req.cookies["user_id"];
   const shortURL = req.params.shortURL;
 
-  if (userID === urlDatabase[shortURL].userID) {
-    delete urlDatabase[shortURL];
-    res.redirect("/urls");
+  if (!userID) {
+    return res.status(403).send("Please log in to delete URL.");
   }
-  res.status(403).send("Only the creator of this URL can delete it.");
+
+  if (userID === urlDatabase[shortURL].userID) { // user logged in and can delete their own URL
+    delete urlDatabase[shortURL];
+    return res.redirect("/urls");
+  }
+  res.status(403).send("Only the creator of this URL can delete it."); // logged in but not owner
 });
 
 

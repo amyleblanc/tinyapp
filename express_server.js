@@ -83,7 +83,7 @@ app.get("/urls", (req, res) => {
   const userURLs = findUserURL(userID);
   const templateVars = { urls: userURLs, user: users[userID] };
 
-  if(!userID) {
+  if (!userID) {
     res.send("Please log in to see your URLs or register to create an account!");
   }
   res.render("urls_index", templateVars);
@@ -148,7 +148,7 @@ app.post("/register", (req, res) => {
     res.status(400).send("Sorry, both email and password fields must be completed.");
   }
   
-  if (!checkEmail(req.body.email) {
+  if (!checkEmail(req.body.email)) {
     users[newID] = { id: newID, email: req.body.email, password: hashedPassword };
     res.cookie("user_id", newID);
     res.redirect("/urls");
@@ -176,10 +176,10 @@ app.post("/urls/:shortURL",(req, res) => { // ask mentor to verify this approach
   const allowedURLs = findUserURL(userID);
   
   if (Object.keys(allowedURLs).length === 0) {
-    res.status(403).send("Only the creator of this URL can edit.")
+    res.status(403).send("Only the creator of this URL can edit.");
   }
   urlDatabase[shortURL] = { longURL, userID };  // shortURL displays as :shortURL
-  res.redirect("/urls");  
+  res.redirect("/urls");
 });
 
 
@@ -217,13 +217,12 @@ app.post("/logout", (req, res) => {
 app.post("/urls/:shortURL/delete",(req, res)=> { // ask mentor to verify this approach
   const userID = req.cookies["user_id"];
   const shortURL = req.params.shortURL;
-  const userURLs = findUserURL(userID);
 
   if (userID === urlDatabase[shortURL].userID) {
     delete urlDatabase[shortURL];
     res.redirect("/urls");
   }
-  res.status(403).send("Only the creator of this URL can delete it.")
+  res.status(403).send("Only the creator of this URL can delete it.");
 });
 
 

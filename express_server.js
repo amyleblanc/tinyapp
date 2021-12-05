@@ -54,7 +54,10 @@ const users = {
 
 // SERVER HOME PAGE
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const userID = req.session.user_id;
+  const templateVars = { urls: urlDatabase, user: users[userID] };
+
+  res.render("home", templateVars);
 });
 
 

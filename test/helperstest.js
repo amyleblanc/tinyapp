@@ -14,6 +14,6 @@ describe('getUserByEmail', function() {
     const user = getUserByEmail("unknown@email.com", users);
     const expectedOutput = false;
     assert.isFalse(user, expectedOutput);
-  })
+  });
 
 });

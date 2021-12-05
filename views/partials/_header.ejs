@@ -14,8 +14,8 @@
         <% if(user) { %>
           <!-- the Cookie is there-->          
           <form class="form-inline my-2 my-lg-0" method="POST" action="/logout">
-            <span class="text-light mx-2">Logged in as: <%=user.email %>!</span>
-            <button class="btn btn-outline-dark">Logout</button>
+            <span class="text-light mx-2">Logged in as: <%=user.email %></span>
+            <button class="btn btn-outline-light">Logout</button>
           </form>
           <% } else { %>
             <!-- The cookie is not there-->

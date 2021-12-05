@@ -25,14 +25,23 @@ const generateRandomString = () => {
   return randomString;
 };
 
-const checkEmail = (emailAddress) => {
-  for (const id in users) {
-    if (users[id].email === emailAddress) {
-      return users[id].id;
+const getUserByEmail = (emailAddress, database) => {
+  for (const id in database) {
+    if (database[id].email === emailAddress) {
+      return database[id].id;
     }
   }
   return false;
 };
+
+// const checkEmail = (emailAddress) => {
+//   for (const id in users) {
+//     if (users[id].email === emailAddress) {
+//       return users[id].id;
+//     }
+//   }
+//   return false;
+// };
 
 const findUserURL = (id) => {
   let userURL = {};
@@ -132,8 +141,9 @@ app.post("/register", (req, res) => {
 
   if (isEmailPasswordEmpty) {
     return res.status(400).send("Sorry, both email and password fields must be completed.");
-  }  
-  if (!checkEmail(req.body.email)) {
+  }
+  // if (!checkEmail(req.body.email)) {
+  if (!getUserByEmail(req.body.email, users)) {
     users[newID] = { id: newID, email: req.body.email, password: hashedPassword };
     req.session.user_id = newID;
     return res.redirect("/urls");
@@ -159,7 +169,6 @@ app.post("/urls/:shortURL",(req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
   const allowedURLs = findUserURL(userID);
-  console.log(shortURL);
   
   if (Object.keys(allowedURLs).length === 0) {
     return res.status(403).send("Only the creator of this URL can edit.");
@@ -179,9 +188,11 @@ app.get("/login", (req, res) => {
 
 
 app.post("/login", (req, res) => {
-  const userID = checkEmail(req.body.email);
+  // const userID = checkEmail(req.body.email);
+  const userID = getUserByEmail(req.body.email, users);
 
-  if (!checkEmail(req.body.email)) {
+  // if (!checkEmail(req.body.email)) {
+  if (!getUserByEmail(req.body.email, users)) {
     return res.status(403).send("Sorry, this email has not been registered.");
   }
   if (!bcrypt.compareSync(req.body.password, users[userID].password)) {

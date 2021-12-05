@@ -1,14 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const bcrypt = require('bcryptjs');
-const cookieSession = require('cookie-session')
-const getUserByEmail = require('./helpers');
+const bcrypt = require("bcryptjs");
+const cookieSession = require("cookie-session");
+const getUserByEmail = require("./helpers.js");
 const app = express();
 const PORT = 8080;
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ['yeti%2Bcoffee%2Btravel%2Bmug&qid=1638664552&'],
@@ -217,3 +215,5 @@ app.use(function(req, res) {
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}!`);
 });
+
+module.exports = users;

@@ -34,15 +34,6 @@ const getUserByEmail = (emailAddress, database) => {
   return false;
 };
 
-// const checkEmail = (emailAddress) => {
-//   for (const id in users) {
-//     if (users[id].email === emailAddress) {
-//       return users[id].id;
-//     }
-//   }
-//   return false;
-// };
-
 const findUserURL = (id) => {
   let userURL = {};
   for (const key in urlDatabase) {
@@ -142,7 +133,6 @@ app.post("/register", (req, res) => {
   if (isEmailPasswordEmpty) {
     return res.status(400).send("Sorry, both email and password fields must be completed.");
   }
-  // if (!checkEmail(req.body.email)) {
   if (!getUserByEmail(req.body.email, users)) {
     users[newID] = { id: newID, email: req.body.email, password: hashedPassword };
     req.session.user_id = newID;
@@ -188,10 +178,8 @@ app.get("/login", (req, res) => {
 
 
 app.post("/login", (req, res) => {
-  // const userID = checkEmail(req.body.email);
   const userID = getUserByEmail(req.body.email, users);
 
-  // if (!checkEmail(req.body.email)) {
   if (!getUserByEmail(req.body.email, users)) {
     return res.status(403).send("Sorry, this email has not been registered.");
   }

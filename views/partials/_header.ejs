@@ -12,12 +12,9 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
 
         <% if(user) { %>
-          <!-- the Cookie is there-->
-          <span>
-            <h5>Logged In As: <%=user.email %>!</h5>
-          </span>
-
-          <form method="POST" action="/logout">
+          <!-- the Cookie is there-->          
+          <form class="form-inline my-2 my-lg-0" method="POST" action="/logout">
+            <span class="text-light mx-2">Logged in as: <%=user.email %>!</span>
             <button class="btn btn-outline-dark">Logout</button>
           </form>
           <% } else { %>

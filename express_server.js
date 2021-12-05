@@ -8,13 +8,10 @@ const PORT = 8080;
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
-// app.use(cookieSession({
-//   name: 'session',
-//   keys: [/* secret keys */],
-
-//   // Cookie Options
-//   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-// }));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['my very secret key'],
+}));
 
 app.set("view engine", "ejs");
 
@@ -73,7 +70,8 @@ app.get("/", (req, res) => {
 
 // SHOW ALL SHORTENED URLS IN DATABASE
 app.get("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
+  // const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const userURLs = findUserURL(userID);
   const templateVars = { urls: userURLs, user: users[userID] };
 
@@ -86,7 +84,8 @@ app.get("/urls", (req, res) => {
 
 // NEW SHORT URL LANDING PAGE
 app.get("/urls/new", (req, res) => {
-  const userID = req.cookies["user_id"];
+  // const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const templateVars = { urls: urlDatabase, user: users[userID] };
   if (userID) {
     res.render("urls_new", templateVars);
@@ -99,7 +98,8 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
-  const userID = req.cookies["user_id"];
+  // const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const templateVars = { shortURL, longURL, user: users[userID] };
 
   res.render("urls_show", templateVars);
@@ -108,7 +108,8 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // REGISTRATION PAGE
 app.get("/register", (req, res) => {
-  const userID = req.cookies["user_id"];
+  // const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const templateVars = { urls: urlDatabase, user: users[userID] };
 
   res.render("registration", templateVars);
@@ -139,7 +140,8 @@ app.post("/register", (req, res) => {
   
   if (!checkEmail(req.body.email)) {
     users[newID] = { id: newID, email: req.body.email, password: hashedPassword };
-    res.cookie("user_id", newID);
+    req.session.user_id = newID;
+    // res.cookie("user_id", newID);
     res.redirect("/urls");
   } else {
     res.status(400).send("Sorry, this email has already been registered.");
@@ -149,7 +151,8 @@ app.post("/register", (req, res) => {
 
 // CREATE NEW URL
 app.post("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
+  // const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const newKey = generateRandomString();
   urlDatabase[newKey] = { "longURL": req.body.longURL, "userID": userID };
 
@@ -159,7 +162,8 @@ app.post("/urls", (req, res) => {
 
 // EDIT
 app.post("/urls/:shortURL",(req, res) => {
-  const userID = req.cookies["user_id"];
+  // const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
   const allowedURLs = findUserURL(userID);
@@ -175,7 +179,8 @@ app.post("/urls/:shortURL",(req, res) => {
 
 // LOGIN & SET COOKIE
 app.get("/login", (req, res) => {
-  const userID = req.cookies["user_id"];
+  // const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const templateVars = { urls: urlDatabase, user: users[userID] };
 
   res.render("login", templateVars);
@@ -192,32 +197,35 @@ app.post("/login", (req, res) => {
     res.status(403).send("Sorry, this password is incorrect.");
   }
   
-  res.cookie("user_id", userID);
+  // res.cookie("user_id", userID);
+  req.session.user_id = userID;
   res.redirect("/urls");
 });
 
 
 // LOGOUT & DELETE COOKIE
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  // res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/login");
 });
 
 
 // DELETE
-app.post("/urls/:shortURL/delete",(req, res)=> { // ask mentor to verify this approach
-  const userID = req.cookies["user_id"];
+app.post("/urls/:shortURL/delete",(req, res)=> {
+  // const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const shortURL = req.params.shortURL;
 
   if (!userID) {
     return res.status(403).send("Please log in to delete URL.");
   }
 
-  if (userID === urlDatabase[shortURL].userID) { // user logged in and can delete their own URL
+  if (userID === urlDatabase[shortURL].userID) {
     delete urlDatabase[shortURL];
     return res.redirect("/urls");
   }
-  res.status(403).send("Only the creator of this URL can delete it."); // logged in but not owner
+  res.status(403).send("Only the creator of this URL can delete it.");
 });
 
 

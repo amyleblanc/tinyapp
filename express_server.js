@@ -2,7 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const bcrypt = require('bcryptjs');
-var cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session')
+const getUserByEmail = require('./helpers');
 const app = express();
 const PORT = 8080;
 
@@ -23,15 +24,6 @@ const generateRandomString = () => {
     randomString += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return randomString;
-};
-
-const getUserByEmail = (emailAddress, database) => {
-  for (const id in database) {
-    if (database[id].email === emailAddress) {
-      return database[id].id;
-    }
-  }
-  return false;
 };
 
 const findUserURL = (id) => {
